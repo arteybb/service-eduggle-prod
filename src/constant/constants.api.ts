@@ -1,0 +1,3 @@
+export enum CONSTANTS {
+  USER_NOT_EXIST = 'USER_NOT_EXIST',
+}
