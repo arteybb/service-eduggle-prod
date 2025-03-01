@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CONSTANTS } from 'src/constant/constants.api';
@@ -37,44 +37,13 @@ export class AuthService {
     }
   }
 
-  async verifyToken(token: string): Promise<any> {
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      return decodedToken; // Token ถูกต้อง
-    } catch (error) {
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+  async login(payload: { email: string }): Promise<any> {
+    if (!payload.email) {
+      throw new UnauthorizedException();
     }
-  }
-
-  async login(payload: { email: string; idToken?: string }): Promise<any> {
-    if (payload.idToken) {
-      try {
-        const decodedToken = await this.verifyToken(payload.idToken);
-        console.log('Decoded Token:', decodedToken);
-        if (decodedToken.email !== payload.email) {
-          throw new HttpException(
-            {
-              resCode: HttpStatus.BAD_REQUEST,
-              resDesc: 'Email in token does not match',
-            },
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-      } catch (error) {
-        throw new HttpException(
-          {
-            resCode: HttpStatus.UNAUTHORIZED,
-            resDesc: 'Invalid ID Token',
-          },
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-    }
-
     const user = await this.userModel.findOne({
       email: payload.email,
     });
-
     if (!user) {
       throw new HttpException(
         {
@@ -84,9 +53,12 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
     return user;
   }
+
+
+
+  
 
   async register(payload: SignUpWithEmailPayload): Promise<any> {
     try {
