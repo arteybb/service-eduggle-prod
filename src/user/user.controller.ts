@@ -39,11 +39,11 @@ export class UserController {
     return user;
   }
 
-  @Put('edit/:userId')
+  @Put('edit/:uid')
   @UseInterceptors(
     FileInterceptor('photoImg', {
       storage: diskStorage({
-        destination: './uploads', // กำหนดที่เก็บไฟล์
+        destination: './uploads',
         filename: (req, file, callback) => {
           const fileName = `${Date.now()}-${file.originalname}`;
           callback(null, fileName);
@@ -52,7 +52,7 @@ export class UserController {
     }),
   )
   async updateUserProfile(
-    @Param('userId') userId: string,
+    @Param('uid') uid: string,
     @Body() updateProfileDto: UpdateProfileDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -60,6 +60,6 @@ export class UserController {
       updateProfileDto.photoImg = file.filename;
     }
 
-    return this.userService.updateUser(userId, updateProfileDto);
+    return this.userService.updateUser(uid, updateProfileDto);
   }
 }
