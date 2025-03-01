@@ -36,4 +36,10 @@ export class EnrollController {
   async getUserEnrollments(@Param('uid') uid: string) {
     return this.enrollService.getUserEnrollments(uid);
   }
+
+  @Get('course/:courseId/count')
+  async getCourseEnrollmentCount(@Param('courseId') courseId: string) {
+    const count = await this.enrollService.getCourseEnrollmentCount(courseId);
+    return { count };
+  }
 }

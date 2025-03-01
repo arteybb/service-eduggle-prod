@@ -35,4 +35,12 @@ export class EnrollService {
 
     return enrollments.map((enrollment) => enrollment.courseId);
   }
+
+  async getCourseEnrollmentCount(courseId: string): Promise<number> {
+    const count = await this.enrollmentModel.countDocuments({
+      courseId,
+      status: 'active',
+    });
+    return count;
+  }
 }
