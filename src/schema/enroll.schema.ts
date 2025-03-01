@@ -9,6 +9,8 @@ const EnrollmentSchema = new mongoose.Schema({
   },
   enrollmentDate: { type: Date, default: Date.now },
   status: { type: String, default: 'active' },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 export default EnrollmentSchema;

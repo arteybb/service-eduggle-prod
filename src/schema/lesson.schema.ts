@@ -9,6 +9,8 @@ const LessonSchema = new mongoose.Schema({
     ref: 'Course',
     required: true,
   },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 export default LessonSchema;

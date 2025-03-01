@@ -8,6 +8,8 @@ const UserSchema = new mongoose.Schema({
   photoImg: String,
   photoURL: String,
   role: String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 export default UserSchema;

@@ -7,7 +7,9 @@ const QuizSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course',
     required: true,
-  }, // เชื่อมกับ Course
+  },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 export default QuizSchema;
