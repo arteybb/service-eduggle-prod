@@ -7,7 +7,6 @@ import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
 import { EnrollModule } from './enroll/enroll.module';
 import { DiscussionModule } from './discussion/discussion.module';
-import { LessonResolver } from './lesson/lesson.resolver';
 import { LessonModule } from './lesson/lesson.module';
 
 @Module({
@@ -23,6 +22,6 @@ import { LessonModule } from './lesson/lesson.module';
     LessonModule,
   ],
   controllers: [AppController],
-  providers: [AppService, LessonResolver],
+  providers: [AppService],
 })
 export class AppModule {}
