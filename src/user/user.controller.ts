@@ -30,11 +30,11 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':email')
-  async findOne(@Param('email') email: string) {
-    const user = await this.userService.findOne(email);
+  @Get(':uid')
+  async findOne(@Param('uid') uid: string) {
+    const user = await this.userService.findOne(uid);
     if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
+      throw new NotFoundException(`User with uid ${uid} not found`);
     }
     return user;
   }

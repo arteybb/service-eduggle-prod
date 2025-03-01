@@ -12,6 +12,10 @@ export type CustomTokenResponse = {
 export class SignUpWithEmailPayload {
   @IsString()
   @IsNotEmpty()
+  uid: string;
+
+  @IsString()
+  @IsNotEmpty()
   email: string;
 
   @IsString()
@@ -24,3 +28,4 @@ export class SignUpWithEmailPayload {
   @IsString()
   photoURL: string;
 }
+

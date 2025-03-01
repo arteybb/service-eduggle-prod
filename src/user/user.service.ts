@@ -19,8 +19,8 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
-  findOne(email: string) {
-    return this.userModel.findOne({ email }).exec();
+  findOne(uid: string) {
+    return this.userModel.findOne({ uid }).exec();
   }
 
   async updateUser(

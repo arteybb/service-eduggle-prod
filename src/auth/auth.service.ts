@@ -90,8 +90,9 @@ export class AuthService {
 
   async register(payload: SignUpWithEmailPayload): Promise<any> {
     try {
-      // Create a new user document
+      console.log(payload.uid);
       const createdUser = new this.userModel({
+        uid: payload.uid,
         email: payload.email,
         displayName: payload.displayName,
         photoImg: payload?.photoImg,
@@ -99,14 +100,7 @@ export class AuthService {
         role: 'M',
       });
 
-      // Save the user to the database
-      await createdUser.save();
-
-      return {
-        uid: createdUser._id, // Mongoose auto-generates the '_id'
-        email: createdUser.email,
-        displayName: createdUser.displayName,
-      };
+      return await createdUser.save();
     } catch (error) {
       throw new Error(`Registration failed: ${error.message}`);
     }
