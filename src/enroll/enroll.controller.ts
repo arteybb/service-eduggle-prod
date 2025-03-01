@@ -14,9 +14,9 @@ export class EnrollController {
   constructor(private readonly enrollService: EnrollService) {}
 
   @Post('')
-  async enroll(@Body() enrollDto: { userId: string; courseId: string }) {
+  async enroll(@Body() enrollDto: { uid: string; courseId: string }) {
     const isAlreadyEnrolled = await this.enrollService.isEnrolled(
-      enrollDto.userId,
+      enrollDto.uid,
       enrollDto.courseId,
     );
 
@@ -26,14 +26,14 @@ export class EnrollController {
 
     // หากยังไม่ enroll ให้ enroll ผู้ใช้
     const result = await this.enrollService.enrollUser(
-      enrollDto.userId,
+      enrollDto.uid,
       enrollDto.courseId,
     );
     return { message: 'Successfully enrolled in the course.', data: result };
   }
 
-  @Get('user/:userId/courses')
-  async getUserEnrollments(@Param('userId') userId: string) {
-    return this.enrollService.getUserEnrollments(userId);
+  @Get('user/:uid/courses')
+  async getUserEnrollments(@Param('uid') uid: string) {
+    return this.enrollService.getUserEnrollments(uid);
   }
 }

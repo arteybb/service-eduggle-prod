@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateEnrollDto } from './dto/create-enroll.dto';
-import { UpdateEnrollDto } from './dto/update-enroll.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -10,34 +8,31 @@ export class EnrollService {
     @InjectModel('Enrollment') private readonly enrollmentModel: Model<any>,
   ) {}
 
-  // ฟังก์ชันสำหรับ enroll ผู้ใช้ใน course
-  async enrollUser(userId: string, courseId: string) {
+  async enrollUser(uid: string, courseId: string) {
     const enrollment = new this.enrollmentModel({
-      userId,
+      uid,
       courseId,
     });
-    return await enrollment.save(); // บันทึกข้อมูลการ enroll
+    return await enrollment.save();
   }
 
-  // ฟังก์ชันสำหรับตรวจสอบว่า user ได้ enroll ใน course หรือยัง
-  async isEnrolled(userId: string, courseId: string) {
+  async isEnrolled(uid: string, courseId: string) {
     const enrollment = await this.enrollmentModel.findOne({
-      userId,
+      uid,
       courseId,
-      status: 'active', // เช็คว่า enroll ยังอยู่
+      status: 'active',
     });
-    return !!enrollment; // คืนค่าจริงหาก enroll แล้ว
+    return !!enrollment;
   }
 
-  // ฟังก์ชันสำหรับดึงข้อมูลคอร์สทั้งหมดที่ user ได้ enroll
-  async getUserEnrollments(userId: string) {
+  async getUserEnrollments(uid: string) {
     const enrollments = await this.enrollmentModel
       .find({
-        userId,
-        status: 'active', // เช็คเฉพาะการ enroll ที่ยัง active อยู่
+        uid,
+        status: 'active',
       })
-      .populate('courseId'); // ใช้ populate ถ้าต้องการข้อมูลจากคอร์ส (เช่น ชื่อคอร์ส, รายละเอียด)
+      .populate('courseId');
 
-    return enrollments.map((enrollment) => enrollment.courseId); // คืนค่าข้อมูลคอร์สที่ user ได้ enroll
+    return enrollments.map((enrollment) => enrollment.courseId);
   }
 }
