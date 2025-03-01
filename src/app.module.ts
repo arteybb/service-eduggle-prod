@@ -7,6 +7,8 @@ import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
 import { EnrollModule } from './enroll/enroll.module';
 import { DiscussionModule } from './discussion/discussion.module';
+import { LessonResolver } from './lesson/lesson.resolver';
+import { LessonModule } from './lesson/lesson.module';
 
 @Module({
   imports: [
@@ -18,8 +20,9 @@ import { DiscussionModule } from './discussion/discussion.module';
     CourseModule,
     EnrollModule,
     DiscussionModule,
+    LessonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LessonResolver],
 })
 export class AppModule {}
