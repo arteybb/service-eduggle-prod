@@ -13,7 +13,7 @@ import { EnrollService } from './enroll.service';
 export class EnrollController {
   constructor(private readonly enrollService: EnrollService) {}
 
-  @Post('enroll')
+  @Post('')
   async enroll(@Body() enrollDto: { userId: string; courseId: string }) {
     const isAlreadyEnrolled = await this.enrollService.isEnrolled(
       enrollDto.userId,
