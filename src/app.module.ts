@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
 import { EnrollModule } from './enroll/enroll.module';
+import { DiscussionModule } from './discussion/discussion.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EnrollModule } from './enroll/enroll.module';
     UserModule,
     CourseModule,
     EnrollModule,
+    DiscussionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
