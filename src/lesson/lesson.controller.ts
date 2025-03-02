@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto, UpdateLessonDto } from './dto/lesson.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -11,22 +21,28 @@ export class LessonController {
 
   @Post('create')
   @UseInterceptors(
-    FileInterceptor('media', {
+    FileInterceptor('mediaPath', {
       storage: diskStorage({
-        destination: './uploads/media',
+        destination: './uploads/media', // โฟลเดอร์สำหรับเก็บไฟล์
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          const filename = `lesson-${uniqueSuffix}${ext}`;
-          callback(null, filename);
+          const fileName = `${Date.now()}-${file.originalname}`;
+          callback(null, fileName);
         },
       }),
     }),
   )
-  async create(@Body() createLessonDto: CreateLessonDto, @UploadedFile() file) {
+  async createLesson(
+    @Body() createLessonDto: CreateLessonDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log('Received file:', file);
+    console.log('Received body:', createLessonDto);
+
+    // ถ้ามีไฟล์ ให้เพิ่ม mediaPath
     if (file) {
       createLessonDto.mediaPath = file.filename;
     }
+
     return this.lessonService.create(createLessonDto);
   }
 
@@ -46,7 +62,8 @@ export class LessonController {
       storage: diskStorage({
         destination: './uploads/media',
         filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
           const filename = `lesson-${uniqueSuffix}${ext}`;
           callback(null, filename);
@@ -54,7 +71,11 @@ export class LessonController {
       }),
     }),
   )
-  async update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto, @UploadedFile() file) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateLessonDto: UpdateLessonDto,
+    @UploadedFile() file,
+  ) {
     if (file) {
       updateLessonDto.mediaPath = file.filename;
     }

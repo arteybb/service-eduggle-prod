@@ -11,24 +11,24 @@ export class LessonService {
   ) {}
 
   async create(createLessonDto: CreateLessonDto) {
-    // Check if course exists
-    const course = await this.courseModel.findById(createLessonDto.courseId).exec();
+    const course = await this.courseModel
+      .findById(createLessonDto.courseId)
+      .exec();
     if (!course) {
-      throw new NotFoundException(`Course with ID ${createLessonDto.courseId} not found`);
+      throw new NotFoundException(
+        `Course with ID ${createLessonDto.courseId} not found`,
+      );
     }
 
-    // Create new lesson
     const newLesson = new this.lessonModel(createLessonDto);
     const savedLesson = await newLesson.save();
 
-    // Add lesson to course
-    if (!course.lessons) {
-      course.lessons = [];
-    }
+    // เพิ่ม lesson ID ลงใน course
+    course.lessons = course.lessons || [];
     course.lessons.push(savedLesson._id);
     await course.save();
 
-    // Add media URL if mediaPath exists
+    // ถ้ามีไฟล์อัปโหลด ให้แปลง mediaPath เป็น URL
     const lessonObj = savedLesson.toObject();
     if (lessonObj.mediaPath) {
       lessonObj.mediaUrl = `http://localhost:3000/uploads/media/${lessonObj.mediaPath}`;
@@ -38,9 +38,12 @@ export class LessonService {
   }
 
   async findByCourse(courseId: string) {
-    const lessons = await this.lessonModel.find({ courseId }).sort({ order: 1 }).exec();
-    
-    return lessons.map(lesson => {
+    const lessons = await this.lessonModel
+      .find({ courseId })
+      .sort({ order: 1 })
+      .exec();
+
+    return lessons.map((lesson) => {
       if (lesson.mediaPath) {
         lesson = lesson.toObject();
         lesson.mediaUrl = `http://localhost:3000/uploads/media/${lesson.mediaPath}`;
@@ -54,12 +57,12 @@ export class LessonService {
     if (!lesson) {
       throw new NotFoundException(`Lesson with ID ${id} not found`);
     }
-    
+
     const lessonObj = lesson.toObject();
     if (lessonObj.mediaPath) {
       lessonObj.mediaUrl = `http://localhost:3000/uploads/media/${lessonObj.mediaPath}`;
     }
-    
+
     return lessonObj;
   }
 
@@ -67,16 +70,16 @@ export class LessonService {
     const updatedLesson = await this.lessonModel
       .findByIdAndUpdate(id, updateLessonDto, { new: true })
       .exec();
-    
+
     if (!updatedLesson) {
       throw new NotFoundException(`Lesson with ID ${id} not found`);
     }
-    
+
     const lessonObj = updatedLesson.toObject();
     if (lessonObj.mediaPath) {
       lessonObj.mediaUrl = `http://localhost:3000/uploads/media/${lessonObj.mediaPath}`;
     }
-    
+
     return lessonObj;
   }
 
@@ -87,10 +90,9 @@ export class LessonService {
     }
 
     // Remove lesson from course
-    await this.courseModel.updateOne(
-      { _id: lesson.courseId },
-      { $pull: { lessons: id } }
-    ).exec();
+    await this.courseModel
+      .updateOne({ _id: lesson.courseId }, { $pull: { lessons: id } })
+      .exec();
 
     // Delete the lesson
     return this.lessonModel.findByIdAndDelete(id).exec();

@@ -9,15 +9,12 @@ async function bootstrap() {
     cors: true,
   });
 
-  // ตั้ง Global Prefix สำหรับ API
   app.setGlobalPrefix('api');
 
-  // ใช้ Static Assets สำหรับไฟล์ที่อยู่ในโฟลเดอร์ uploads
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', // URL path ที่จะเข้าถึงไฟล์ใน uploads
+    prefix: '/uploads/',
   });
 
-  // เริ่มเซิร์ฟเวอร์บนพอร์ตที่กำหนดใน environment หรือ 3000
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
