@@ -1,26 +1,98 @@
-import { Injectable } from '@nestjs/common';
-import { CreateLessonDto } from './dto/create-lesson.dto';
-import { UpdateLessonDto } from './dto/update-lesson.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateLessonDto, UpdateLessonDto } from './dto/lesson.dto';
 
 @Injectable()
 export class LessonService {
-  create(createLessonDto: CreateLessonDto) {
-    return 'This action adds a new lesson';
+  constructor(
+    @InjectModel('Lesson') private readonly lessonModel: Model<any>,
+    @InjectModel('Course') private readonly courseModel: Model<any>,
+  ) {}
+
+  async create(createLessonDto: CreateLessonDto) {
+    // Check if course exists
+    const course = await this.courseModel.findById(createLessonDto.courseId).exec();
+    if (!course) {
+      throw new NotFoundException(`Course with ID ${createLessonDto.courseId} not found`);
+    }
+
+    // Create new lesson
+    const newLesson = new this.lessonModel(createLessonDto);
+    const savedLesson = await newLesson.save();
+
+    // Add lesson to course
+    if (!course.lessons) {
+      course.lessons = [];
+    }
+    course.lessons.push(savedLesson._id);
+    await course.save();
+
+    // Add media URL if mediaPath exists
+    const lessonObj = savedLesson.toObject();
+    if (lessonObj.mediaPath) {
+      lessonObj.mediaUrl = `http://localhost:3000/uploads/media/${lessonObj.mediaPath}`;
+    }
+
+    return lessonObj;
   }
 
-  findAll() {
-    return `This action returns all lesson`;
+  async findByCourse(courseId: string) {
+    const lessons = await this.lessonModel.find({ courseId }).sort({ order: 1 }).exec();
+    
+    return lessons.map(lesson => {
+      if (lesson.mediaPath) {
+        lesson = lesson.toObject();
+        lesson.mediaUrl = `http://localhost:3000/uploads/media/${lesson.mediaPath}`;
+      }
+      return lesson;
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} lesson`;
+  async findById(id: string) {
+    const lesson = await this.lessonModel.findById(id).exec();
+    if (!lesson) {
+      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    }
+    
+    const lessonObj = lesson.toObject();
+    if (lessonObj.mediaPath) {
+      lessonObj.mediaUrl = `http://localhost:3000/uploads/media/${lessonObj.mediaPath}`;
+    }
+    
+    return lessonObj;
   }
 
-  update(id: number, updateLessonDto: UpdateLessonDto) {
-    return `This action updates a #${id} lesson`;
+  async update(id: string, updateLessonDto: UpdateLessonDto) {
+    const updatedLesson = await this.lessonModel
+      .findByIdAndUpdate(id, updateLessonDto, { new: true })
+      .exec();
+    
+    if (!updatedLesson) {
+      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    }
+    
+    const lessonObj = updatedLesson.toObject();
+    if (lessonObj.mediaPath) {
+      lessonObj.mediaUrl = `http://localhost:3000/uploads/media/${lessonObj.mediaPath}`;
+    }
+    
+    return lessonObj;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} lesson`;
+  async remove(id: string) {
+    const lesson = await this.lessonModel.findById(id).exec();
+    if (!lesson) {
+      throw new NotFoundException(`Lesson with ID ${id} not found`);
+    }
+
+    // Remove lesson from course
+    await this.courseModel.updateOne(
+      { _id: lesson.courseId },
+      { $pull: { lessons: id } }
+    ).exec();
+
+    // Delete the lesson
+    return this.lessonModel.findByIdAndDelete(id).exec();
   }
 }

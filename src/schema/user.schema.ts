@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
   photoImg: String,
   photoURL: String,
   role: String,
+  enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

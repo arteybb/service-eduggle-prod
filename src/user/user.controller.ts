@@ -39,6 +39,11 @@ export class UserController {
     return user;
   }
 
+  @Get(':uid/enrolled-courses')
+  async getEnrolledCourses(@Param('uid') uid: string) {
+    return this.userService.getEnrolledCourses(uid);
+  }
+
   @Put('edit/:uid')
   @UseInterceptors(
     FileInterceptor('photoImg', {

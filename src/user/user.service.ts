@@ -8,7 +8,11 @@ import { UpdateProfileDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('user') private readonly userModel: Model<any>) {
+  constructor(
+    @InjectModel('user') private readonly userModel: Model<any>,
+    @InjectModel('Course') private readonly courseModel: Model<any>,
+    @InjectModel('Enrollment') private readonly enrollmentModel: Model<any>,
+  ) {
     //
   }
   create(createUserDto: CreateUserDto) {
@@ -21,6 +25,15 @@ export class UserService {
 
   findOne(uid: string) {
     return this.userModel.findOne({ uid }).exec();
+  }
+
+  async getEnrolledCourses(uid: string) {
+    const enrollments = await this.enrollmentModel
+      .find({ uid, status: 'active' })
+      .populate('courseId')
+      .exec();
+    
+    return enrollments.map(enrollment => enrollment.courseId);
   }
 
   async updateUser(
